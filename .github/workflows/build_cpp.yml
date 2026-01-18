@@ -1,0 +1,30 @@
+name: Build C++ Clipboard Manager
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Setup MSVC Compiler
+      uses: ilammy/msvc-dev-cmd@v1
+
+    - name: Compile C++ Code
+      # /EHsc enables exceptions (needed for std::string)
+      # /O2 optimizes for speed
+      # user32.lib and kernel32.lib are standard Windows libraries
+      run: |
+        cl.exe /EHsc /O2 /Fe:SmartClip.exe main.cpp user32.lib kernel32.lib gdi32.lib shell32.lib
+
+    - name: Upload EXE
+      uses: actions/upload-artifact@v4
+      with:
+        name: SmartClipboard-Cpp-App
+        path: SmartClip.exe
